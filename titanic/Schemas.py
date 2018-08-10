@@ -6,29 +6,29 @@ SCHEMAS = {
     'train': {
         'PassengerId': str,
         'Survived': int,
-        'Pclass': str,
+        'Pclass': 'category',
         'Name': str,
-        'Sex': str,
+        'Sex': 'category',
         'Age': float,
         'SibSp': float,
         'Parch': float,
         'Ticket': str,
         'Fare': float,
         'Cabin': str,
-        'Embarked': str
+        'Embarked': 'category'
     },
     'test': {
         'PassengerId': str,
-        'Pclass': str,
+        'Pclass': 'category',
         'Name': str,
-        'Sex': str,
+        'Sex': 'category',
         'Age': float,
         'SibSp': float,
         'Parch': float,
         'Ticket': str,
         'Fare': float,
         'Cabin': str,
-        'Embarked': str
+        'Embarked': 'category'
     },
     'submission': {
         'PassengerId': str,
