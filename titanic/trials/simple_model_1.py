@@ -1,10 +1,9 @@
 """
-This script is a simple LR model with minimal feature engineering.
+This script is a simple LR model with minimal feature engineering, and no validation set.
 """
 
 import logging
 from ..Loader import Loader
-from ..Paths import DICT_PATHS
 import pandas as pd
 from sklearn.pipeline import make_pipeline
 from ..sk_util import CategoricalEncoder
@@ -22,7 +21,7 @@ df_test.set_index('PassengerId', inplace=True)
 USE_COLS = ['Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']
 TARGET = ['Survived']
 X_train = df_train[USE_COLS].copy()
-y_train = df_train[TARGET].copy()
+y_train = df_train[TARGET].copy().values.reshape(-1,)
 X_test = df_test[USE_COLS].copy()
 
 # Define categories
@@ -32,7 +31,6 @@ for cat_col in col_categories:
     # Ignore nan (we will impute them before encoding)
     cats = X_train[~df_train[cat_col].isnull()][cat_col].unique().tolist()
     categories.update({cat_col: cats})
-print(list(categories.keys()))
 
 # Columns that needs standard scaling
 col_std_scl = ['Age', 'SibSp', 'Parch', 'Fare']
@@ -65,8 +63,9 @@ pipe_train = make_pipeline(
 pipe_train.fit(X_train_fit, y_train)
 print(pipe_train.score(X_train_fit, y_train))
 
+# Testing
+
+
 #print(X_train_fit.describe(include='all'))
 #print(df_train.head())
 #print(df_test.head())
-
-

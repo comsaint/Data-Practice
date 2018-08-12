@@ -51,20 +51,20 @@ class CategoricalEncoder(TransformerMixin):
             X[col] = X[col].astype('category').cat.set_categories(categories)
         return X
 
-
-class StandardScaler(TransformerMixin):
+class DataFrameTransformer(object):
     """
-    Scale a subset of the columns in a DataFrame
+
     """
-    def __init__(self, columns):
-        self.columns = columns
+    def __init__(self, X, pipeline_map, y=None):
+        self.X = X
+        self.y = y
+        self.pipeline_map = pipeline_map
 
-    def fit(self, X, y=None):
-        self.m = X[self.columns].mean()
-        self.v = X[self.columns].std()
-        return self
-
-    def transform(self, X, y=None):
-        X = X.copy()
-        X[self.columns] = X[self.columns].sub(self.m).div(self.v)
-        return X
+    def DataFrameTransformer(self, X, pipeline_map):
+        """
+        Fit and transform a DataFrame `X` according to the pipeline settings specified in `pipeline_map`.
+        :param X: a Pandas DataFrame object.
+        :param pipeline_map: Setting
+        :return:
+        """
+        pass
