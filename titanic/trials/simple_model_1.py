@@ -28,12 +28,10 @@ X_test = df_test[USE_COLS].copy()
 col_categories = ['Sex', 'Embarked']
 categories = dict()
 for cat_col in col_categories:
-    # Ignore nan (we will impute them before encoding)
-    cats = X_train[~df_train[cat_col].isnull()][cat_col].unique().tolist()
+    # Ignore nan (we can impute them before encoding, or by default represent it as all zeros after encoding)
+    cats = X_train[~X_train[cat_col].isnull()][cat_col].unique().tolist()
     categories.update({cat_col: cats})
 
-# Columns that needs standard scaling
-col_std_scl = ['Age', 'SibSp', 'Parch', 'Fare']
 
 # Pipelines
 # Fit and transform all categories
@@ -45,6 +43,9 @@ pipe_cat = make_pipeline(
 X_train_cat_fit = pipe_cat.fit_transform(X_train_cat)
 
 # Fit and transform all scalars
+# Columns that needs standard scaling
+col_std_scl = ['Age', 'SibSp', 'Parch', 'Fare']
+
 X_train_num = X_train[col_std_scl]
 pipe_num = make_pipeline(
     Imputer(strategy='mean'),
