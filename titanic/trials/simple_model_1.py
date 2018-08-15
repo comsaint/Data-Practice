@@ -67,6 +67,11 @@ print(pipe_train.score(X_train_fit, y_train))
 # Testing
 
 
+# Rewrite using sklearn-pandas
+# We have X_train, y_train and X_test to start with.
+from sklearn_pandas import DataFrameMapper
+
+
 #print(X_train_fit.describe(include='all'))
 #print(df_train.head())
 #print(df_test.head())

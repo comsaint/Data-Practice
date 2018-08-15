@@ -49,6 +49,7 @@ class CategoricalEncoder(TransformerMixin):
     def transform(self, X, y=None):
         X = X.copy()
         for col, categories in self.categories.items():
+            print(col, categories)
             X[col] = X[col].astype('category').cat.set_categories(categories)
         return X
 
@@ -119,4 +120,6 @@ class DataFrameTransformer(object):
         lst_pipes = []
         for pair in pipeline_map:
             X_fit, pipe_fit = self.column_transformer(pair[0], pair[1])
-        pass
+            lst_X_out.append(X_fit)
+            lst_pipes
+        X_out = pd.concat(lst_X_out, axis=0)
