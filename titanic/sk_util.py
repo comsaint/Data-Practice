@@ -6,7 +6,7 @@ Reusing this module is encouraged.
 
 import pandas as pd
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.preprocessing import FunctionTransformer, LabelEncoder
 from sklearn.base import TransformerMixin
 
 
@@ -52,6 +52,16 @@ class CategoricalEncoder(TransformerMixin):
             print(col, categories)
             X[col] = X[col].astype('category').cat.set_categories(categories)
         return X
+
+
+class ModifiedLabelEncoder(LabelEncoder):
+
+    def fit_transform(self, y, *args, **kwargs):
+        return super().fit_transform(y).reshape(-1, 1)
+
+    def transform(self, y, *args, **kwargs):
+        return super().transform(y).reshape(-1, 1)
+
 
 class DataFrameTransformer(object):
     """
