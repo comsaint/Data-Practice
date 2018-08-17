@@ -51,7 +51,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 
 from sklearn.model_selection import RandomizedSearchCV
-import scipy
+import scipy, itertools
 
 # Hyperparameters
 dict_param_grid = {
@@ -62,9 +62,10 @@ dict_param_grid = {
     },
     'GaussianNB': None,
     'MLPClassifier': {
-        'hidden_layer_size': (scipy.stats.randint(2, 20),),
+        'hidden_layer_sizes': [x for x in itertools.product((10, 20, 30, 50, 100), repeat=3)],
         'activation': ['relu', 'tanh'],
         'alpha': scipy.stats.expon(scale=100),
+        'max_iter': [200, 1000],
         'early_stopping': [True, False]
     },
     'GradientBoostingClassifier': {'learning_rate': scipy.stats.uniform(loc=0.01, scale=0.15),
@@ -84,22 +85,37 @@ dict_param_grid = {
     'SVC': {'kernel': ['rbf'],
             'C': scipy.stats.expon(scale=100),
             'gamma': scipy.stats.expon(scale=100),
-            'class_weight': ['balanced']}
+            'class_weight': ['balanced'],
+            'probability': [True]}
 }
 
 models = [
+    MLPClassifier(),
     KNeighborsClassifier(),
     GaussianNB(),
     GradientBoostingClassifier(),
     LogisticRegression(),
     RandomForestClassifier(),
     SVC(),
-    MLPClassifier()
 ]
 
+lst_best_models = []
 for model in models:
-    param = dict_param_grid[model.__class__.__name__]
-    print(param)
+    model_name, param = model.__class__.__name__, dict_param_grid[model.__class__.__name__]
+    if param is not None:
+        clf = RandomizedSearchCV(model, param_distributions=param, cv=5, verbose=0, n_jobs=-1, n_iter=200)
+        print("Training model: {}".format(model.__class__.__name__))
+        lst_best_models.append((model_name, clf.fit(X_train_fit, y_train)))
+    else:
+        lst_best_models.append((model_name, model.fit(X_train_fit, y_train)))
+
+# Ensemble of models
+from sklearn.ensemble import VotingClassifier
+from sklearn.cross_validation import cross_val_score
+eclf = VotingClassifier(estimators=lst_best_models, voting='soft')
+eclf.fit(X_train_fit, y_train)
+scores = cross_val_score(eclf, X_train_fit, y_train, cv=5, scoring='accuracy')
+print(scores)
 '''
 clf = RandomizedSearchCV(model, param_distributions=params, cv=5, verbose=1, n_jobs=-1, n_iter=100)
 
@@ -115,7 +131,7 @@ for param in params:
     print('Parameter: {}, best value={}'.format(param, best_model.best_estimator_.get_params()[param]))
 #print("Accuracy: {}".format(best_model.cv_results_['mean_test_score']))
 
-'''
+
 pipe_model = make_pipeline(
     RandomizedSearchCV(LogisticRegression(),
                        param_distributions=param_grid_LR,
@@ -131,7 +147,7 @@ print(pipe_model.score(X_train_fit, y_train))
 # Apply on test set
 X_test_txf = mapper.transform(X_test.copy())
 logging.info("Predicting...")
-y_test_predict = pd.DataFrame(best_model.predict(X_test_txf), index=X_test.index, columns=TARGET)
+y_test_predict = pd.DataFrame(eclf.predict(X_test_txf), index=X_test.index, columns=TARGET)
 
 # Write prediction
 y_test_predict.to_csv(DICT_PATHS['predictions'], encoding='utf-8', index=True)
