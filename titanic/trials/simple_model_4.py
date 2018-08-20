@@ -1,5 +1,5 @@
 """
-Rewrite the pipeline of simple_model_3, and test more models. Also keep record on Comet.ml
+Rewrite the pipeline of simple_model_3, and test more models.
 """
 from sklearn_pandas import DataFrameMapper, CategoricalImputer
 from sklearn_pandas import gen_features
