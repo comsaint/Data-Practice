@@ -3,7 +3,7 @@
 # platform: linux-64
 _license=1.1=py36_1
 alabaster=0.7.10=py36h306e16b_0
-anaconda=5.2.0=py36_3
+anaconda=custom=py36hbbc8b67_0
 anaconda-client=1.6.14=py36_0
 anaconda-navigator=1.5.0=py36_0
 anaconda-project=0.8.2=py36h44fb852_0
@@ -28,7 +28,7 @@ bottleneck=1.2.1=py36haac1ea0_0
 bzip2=1.0.6=h14c3975_5
 ca-certificates=2018.03.07=0
 cairo=1.14.12=h7636065_2
-certifi=2018.4.16=py36_0
+certifi=2018.8.13=py36_0
 cffi=1.11.5=py36h9745a5d_0
 chardet=3.0.4=py36h0f667ec_1
 chest=0.2.3=py36_0
@@ -36,7 +36,7 @@ click=6.7=py36h5253387_0
 cloudpickle=0.5.3=py36_0
 clyent=1.2.2=py36h7e57e65_1
 colorama=0.3.9=py36h489cec4_0
-conda=4.5.9=py36_0
+conda=4.5.10=py36_0
 conda-env=2.6.0=h36134e3_1
 configobj=5.0.6=py36_0
 contextlib2=0.5.5=py36h6c84a62_0
@@ -152,7 +152,7 @@ numpydoc=0.8.0=py36_0
 odo=0.5.1=py36h90ed295_0
 olefile=0.45.1=py36_0
 openpyxl=2.5.3=py36_0
-openssl=1.0.2o=h20670df_0
+openssl=1.0.2p=h14c3975_0
 packaging=17.1=py36_0
 pandas=0.23.0=py36h637b7d7_0
 pandoc=1.19.2.1=hea2e7c5_1
@@ -218,7 +218,7 @@ ruamel_yaml=0.15.35=py36h14c3975_1
 scikit-image=0.13.1=py36h14c3975_1
 scikit-learn=0.19.1=py36h7aa7ec6_0
 scipy=1.1.0=py36hfc37229_0
-seaborn=0.8.1=py36hfad7ec4_0
+seaborn=0.9.0=py36_0
 send2trash=1.5.0=py36_0
 setuptools=39.1.0=py36_0
 simplegeneric=0.8.1=py36_2
