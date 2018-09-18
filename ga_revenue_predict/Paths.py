@@ -6,7 +6,7 @@ import os
 ''' 1. Original data'''
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-PATH_DIR_DATA = os.path.join(ROOT_DIR, r'./data')
+PATH_DIR_DATA = os.path.join(ROOT_DIR, r'data')
 # Raw data set
 FILE_DATA_TRAIN = r'train.csv'
 FILE_DATA_TEST = r'test.csv'

@@ -1,0 +1,16 @@
+Exploration on parsed file:
+1. Some columns contain only 1 value, thus not useful.
+a) socialEngagementType: only 1 unique value, "Not Socially Engaged"
+b) device.browserSize, device.browserVersion, device.flashVersion, device.language,
+device.mobileDeviceBranding, device.mobileDeviceInfo, device.mobileDeviceModel, device.mobileDeviceMarketingName,
+device.mobileInputSelector, device.operatingSystemVersion,
+device.screenColors, device.screenResolution,
+geoNetwork.cityId, geoNetwork.latitude, geoNetwork.longitude, geoNetwork.networkLocation,
+trafficSource.adwordsClickInfo.criteriaParameters,
+
+2. Column "trafficSource.campaignCode" has only 1 row that has a value, omit.
+3) Row with session ID "1559124723625902268_1477529519" seems have been parsed incorrectly.
+Since it has 0 revenue, can consider to drop.
+
+2) Some columns need further parsing:
+a)

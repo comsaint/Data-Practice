@@ -50,8 +50,7 @@ class Loader(object):
             karg = {
                 'converters': {column: json.loads for column in JSON_COLUMNS},
                 'parse_dates': ['date'],
-                'infer_datetime_format': True,
-                'nrows': 10000
+                'infer_datetime_format': True
             }
             logging.info("Loading raw, train data...")
             df_train = self.read_original_data('train', preprocess=False, json_columns=JSON_COLUMNS, **karg)
