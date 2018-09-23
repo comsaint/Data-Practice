@@ -7,7 +7,7 @@ import json
 import pandas as pd
 from pandas.io.json import json_normalize
 import logging
-
+from .Settings import USE_COLS
 
 class Loader(object):
     def __init__(self):
@@ -38,7 +38,7 @@ class Loader(object):
 
         # Preprocess the data if necessary, e.g. date conversion, fillna etc.
         if preprocess is True:
-            pass
+            df = df[USE_COLS]
 
         return df
 
@@ -59,11 +59,13 @@ class Loader(object):
         elif mode == 'parsed':
             karg = {
                 'parse_dates': ['date'],
-                'infer_datetime_format': True
+                'infer_datetime_format': True,
+                'usecols': USE_COLS
             }
             logging.info("Loading parsed, train data...")
             df_train = self.read_original_data('train_parsed', preprocess=False, **karg)
             logging.info("Loading parsed, test data...")
+            karg['usecols'].remove('totals.transactionRevenue')
             df_test = self.read_original_data('test_parsed', preprocess=False, **karg)
         else:
             logging.error("Unrecognized mode: '{}'".format(mode))
