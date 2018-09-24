@@ -73,9 +73,9 @@ automl = autosklearn.classification.AutoSklearnClassifier(
         #tmp_folder=os.path.join('tmp', 'autosklearn_cv_example_tmp'),
         #output_folder=os.path.join('tmp', 'autosklearn_cv_example_out'),
         #delete_tmp_folder_after_terminate=True,
-        resampling_strategy='holdout',
+        resampling_strategy='holdout-iterative-fit',
         #resampling_strategy_arguments={'folds': 10},
-        ml_memory_limit=2048
+        #ml_memory_limit=2048
     )
 # Train to find best parameters
 automl.fit(X_train, y_train, dataset_name='garp', metric=autosklearn.metrics.roc_auc)
