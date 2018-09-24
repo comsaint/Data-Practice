@@ -35,3 +35,6 @@ DICT_PATHS = {
     'sample_submission': FULLPATH_DATA_SAMPLE_SUBMISSION,
     'predictions': FULLPATH_PREDICTIONS
 }
+
+''' 3. Model '''
+PATH_DIR_MODEL = os.path.join(ROOT_DIR, r'models')
