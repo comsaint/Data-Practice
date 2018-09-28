@@ -68,8 +68,8 @@ X_train, X_test, y_train, y_test = train_test_split(TRAIN_preprocessed, TARGET, 
 
 # Auto-sklearn
 automl = autosklearn.classification.AutoSklearnClassifier(
-        time_left_for_this_task=3600,
-        per_run_time_limit=180,
+        time_left_for_this_task=60*60*48,
+        per_run_time_limit=60*60,
         #tmp_folder=os.path.join('tmp', 'autosklearn_cv_example_tmp'),
         #output_folder=os.path.join('tmp', 'autosklearn_cv_example_out'),
         #delete_tmp_folder_after_terminate=True,
