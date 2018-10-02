@@ -14,7 +14,7 @@ class Loader(object):
         pass
 
     @staticmethod
-    def read_original_data(table_code, preprocess=True, json_columns=None, **kwargs):
+    def read_original_data(table_code, preprocess=False, json_columns=None, **kwargs):
         if table_code is None:
             logging.error("No table code supplied.")
             sys.exit(-1)
