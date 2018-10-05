@@ -9,6 +9,7 @@ from pandas.io.json import json_normalize
 import logging
 from .Settings import USE_COLS
 
+
 class Loader(object):
     def __init__(self):
         pass
@@ -42,7 +43,7 @@ class Loader(object):
 
         return df
 
-    def run(self, mode):
+    def run(self, mode, subsample=None):
         logging.info("Running Loader...")
 
         if mode == 'raw':
@@ -52,6 +53,11 @@ class Loader(object):
                 'parse_dates': ['date'],
                 'infer_datetime_format': True
             }
+            if subsample is not None:
+                import random
+                karg.update({'header': 0,
+                             'skiprows': lambda i: i > 0 and random.random() > subsample})
+
             logging.info("Loading raw, train data...")
             df_train = self.read_original_data('train', preprocess=False, json_columns=JSON_COLUMNS, **karg)
             logging.info("Loading raw, test data...")
@@ -62,6 +68,10 @@ class Loader(object):
                 'infer_datetime_format': True,
                 'usecols': USE_COLS
             }
+            if subsample is not None:
+                import random
+                karg.update({'header': 0,
+                             'skiprows': lambda i: i > 0 and random.random() > subsample})
             logging.info("Loading parsed, train data...")
             df_train = self.read_original_data('train_parsed', preprocess=False, **karg)
             logging.info("Loading parsed, test data...")
@@ -75,4 +85,4 @@ class Loader(object):
 
 if __name__ == '__main__':
     loader = Loader()
-    loader.run(mode='parsed')
+    loader.run(mode='raw')

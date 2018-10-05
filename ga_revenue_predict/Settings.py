@@ -18,3 +18,6 @@ USE_COLS = ['channelGrouping', 'date', 'fullVisitorId', 'sessionId',
        'trafficSource.isTrueDirect',
        'trafficSource.keyword', 'trafficSource.medium',
        'trafficSource.referralPath', 'trafficSource.source']
+
+NUM_COLS = ['totals.bounces', 'totals.hits', 'totals.newVisits', 'totals.pageviews',
+            'totals.transactionRevenue', 'totals.visits']
