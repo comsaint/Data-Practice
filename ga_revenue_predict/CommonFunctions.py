@@ -1,4 +1,5 @@
 import pandas as pd
+import json
 
 
 def deduplicate_repeated_sessionId(df):
@@ -27,3 +28,61 @@ def deduplicate_repeated_sessionId(df):
 
 def drop_bounced_sessions(df):
     return df[df['totals.bounces'] == 0].copy()
+
+
+def make_dtypes_dict(df):
+    """
+    Given a Pandas DataFrame, create a dict of columns: dtypes.
+    :param df:
+    :return:
+    """
+    res = df.dtypes.to_frame('dtypes').reset_index()  # create a DF of dtypes
+    return res.set_index('index')['dtypes'].astype(str).to_dict()  # convert to DICT
+
+
+def store_dtypes_json(df, path):
+    """
+    Given a Pandas DataFrame, create a dict of columns: dtypes, and save to `path`.
+    :param df:
+    :param path:
+    :return:
+    """
+    d = make_dtypes_dict(df)
+    with open(path, 'w') as f:
+        json.dump(d, f)
+    return None
+
+
+def read_dtypes_json(path):
+    """
+    Read a JSON file from `path`.
+    :param path:
+    :return:
+    """
+    with open(path, 'r') as f:
+        return json.load(f)
+
+
+def store_df_and_dtypes(df, path, **kwargs):
+    """
+
+    :param df:
+    :param path:
+    :return:
+    """
+    df.to_csv(path, **kwargs)
+    path_dtypes = path.replace(r'.csv', r'.json')
+    store_dtypes_json(df, path_dtypes)
+    return None
+
+
+def read_df_and_dtypes(path, **kwargs):
+    """
+
+    :param path:
+    :param kwargs:
+    :return:
+    """
+    path_dtypes = path.replace(r'.csv', r'.json')
+    kwargs.update({'dtype': read_dtypes_json(path_dtypes)})
+    return pd.read_csv(path, **kwargs)

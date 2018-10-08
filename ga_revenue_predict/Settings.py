@@ -9,9 +9,8 @@ USE_COLS = ['channelGrouping', 'date', 'fullVisitorId', 'sessionId',
        'geoNetwork.networkDomain',
        'geoNetwork.region', 'geoNetwork.subContinent', 'totals.bounces',
        'totals.hits', 'totals.newVisits', 'totals.pageviews',
-       'totals.transactionRevenue', 'totals.visits', 'trafficSource.adContent',
+       'totals.transactionRevenue', 'trafficSource.adContent',
        'trafficSource.adwordsClickInfo.adNetworkType',
-       'trafficSource.adwordsClickInfo.gclId',
        'trafficSource.adwordsClickInfo.isVideoAd',
        'trafficSource.adwordsClickInfo.page',
        'trafficSource.adwordsClickInfo.slot', 'trafficSource.campaign',
@@ -19,5 +18,5 @@ USE_COLS = ['channelGrouping', 'date', 'fullVisitorId', 'sessionId',
        'trafficSource.keyword', 'trafficSource.medium',
        'trafficSource.referralPath', 'trafficSource.source']
 
-NUM_COLS = ['totals.bounces', 'totals.hits', 'totals.newVisits', 'totals.pageviews',
-            'totals.transactionRevenue', 'totals.visits']
+NUM_COLS = ['totals.bounces', 'totals.hits', 'totals.newVisits', 'totals.pageviews']
+TARGET = ['totals.transactionRevenue']
