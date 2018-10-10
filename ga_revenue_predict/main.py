@@ -27,13 +27,13 @@ print(df_train_rc.dtypes)
 
 column_trans_train = make_column_transformer(
     (NUM_COLS, SimpleImputer(strategy='constant', fill_value=0.0)),
-    (TARGET, SimpleImputer(strategy='constant', fill_value=0.0), FunctionTransformer(log1p)),
-    remainder='passthrough'
+    (TARGET, make_pipeline(SimpleImputer(strategy='constant', fill_value=0.0), FunctionTransformer(log1p))),
+    remainder='passthrough', n_jobs=-1
 )
 
 column_trans_test = make_column_transformer(
     (NUM_COLS, SimpleImputer(strategy='constant', fill_value=0.0)),
-    remainder='passthrough'
+    remainder='passthrough', n_jobs=-1
 )
 
 # Column order will be sorted after column transform, need to preserve
@@ -51,5 +51,5 @@ df_test_parsed = pd.DataFrame(column_trans_test.fit_transform(df_test_rc))
 print(df_train_parsed.head())
 print(df_train_parsed.dtypes)
 
-store_df_and_dtypes(df_train_parsed, path=FULLPATH_DATA_TRAIN_PARSED)
-store_df_and_dtypes(df_test_parsed, path=FULLPATH_DATA_TEST_PARSED)
+store_df_and_dtypes(df_train_parsed, path=FULLPATH_DATA_TRAIN_PARSED, index=False)
+store_df_and_dtypes(df_test_parsed, path=FULLPATH_DATA_TEST_PARSED, index=False)
