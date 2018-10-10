@@ -32,3 +32,16 @@ class ColumnSelector(TransformerMixin):
 
     def transform(self, X):
         return X[self.col]
+
+
+class generate_datetime_features(TransformerMixin):
+    def transform(self, X):
+        """
+        Generates following features from `date` object `X`:
+        YEAR, MONTH, DAY OF YEAR, DAY OF MONTH, WEEK OF YEAR, WEEKDAY
+        if `X` is `datetime` object, the following extra features are returned:
+        HOUR, MINUTE, MINUTE OF DAY
+        :param X:
+        :return:
+        """
+        pass

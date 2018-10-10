@@ -25,6 +25,7 @@ df_test_rc = rc.transform(df_test)
 print(df_train_rc.head())
 print(df_train_rc.dtypes)
 
+'''
 column_trans_train = make_column_transformer(
     (NUM_COLS, SimpleImputer(strategy='constant', fill_value=0.0)),
     (TARGET, make_pipeline(SimpleImputer(strategy='constant', fill_value=0.0), FunctionTransformer(log1p))),
@@ -53,3 +54,15 @@ print(df_train_parsed.dtypes)
 
 store_df_and_dtypes(df_train_parsed, path=FULLPATH_DATA_TRAIN_PARSED, index=False)
 store_df_and_dtypes(df_test_parsed, path=FULLPATH_DATA_TEST_PARSED, index=False)
+'''
+print(NUM_COLS)
+from sklearn_pandas import DataFrameMapper
+train_data_mapper = DataFrameMapper([
+     (NUM_COLS, SimpleImputer(strategy='constant', fill_value=0.0)),
+     #(TARGET, [SimpleImputer(strategy='constant', fill_value=0.0), FunctionTransformer(log1p)])
+], input_df=True, df_out=True)
+
+df_train_parsed = train_data_mapper.transform(df_train_rc)
+print(df_train_parsed.head(10))
+print(df_train_parsed.dtypes)
+print(train_data_mapper.transformed_names_)
