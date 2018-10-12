@@ -81,3 +81,18 @@ class PeriodicFeatureEncoder(TransformerMixin):
                            np.cos(2 * np.pi * X / float(self.bound[1] - self.bound[0]))], axis=1)
         X_out.columns = [X.name + '_' + n for n in ['sin', 'cos']]
         return X_out
+
+
+class CategoryByTargetEncoder(TransformerMixin):
+    def __init__(self, encode_val=None):
+        self.encode_val = encode_val
+
+    def fit(self, X, y):
+        col = X.columns
+        mat = pd.concat([X, y], axis=1)
+        mat_grp = mat.groupby(col).agg(['min', 'max', 'avg', 'var', 'std'], as_index=False)
+        self.encode_val = mat_grp.to_dict('records')
+        return self
+
+    def transform(self, X, y=None):
+        pass
