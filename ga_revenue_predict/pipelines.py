@@ -65,3 +65,19 @@ class TimestampToDatetimeConverter(TransformerMixin):
 
     def transform(self, X, y=None):
         return X.map(lambda t: datetime.datetime.fromtimestamp(t, tz=self.tz))
+
+
+class PeriodicFeatureEncoder(TransformerMixin):
+    def __init__(self, bound=None):
+        self.bound = bound
+
+    def fit(self, X, y=None):
+        if self.bound is None:
+            self.bound = [X.min(), X.max()]
+        return self
+
+    def transform(self, X, y=None):
+        X_out = pd.concat([np.sin(2 * np.pi * X / float(self.bound[1] - self.bound[0])),
+                           np.cos(2 * np.pi * X / float(self.bound[1] - self.bound[0]))], axis=1)
+        X_out.columns = [X.name + '_' + n for n in ['sin', 'cos']]
+        return X_out
