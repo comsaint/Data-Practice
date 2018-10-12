@@ -73,10 +73,14 @@ class CategoryGroupEncoder(BaseEstimator, TransformerMixin):
     `max_group` equals to the (ceiling of) square-root of number of categories by default.
     """
     def __init__(self, max_groups=None, groups=None):
-        self.max_groups = max_groups
-        self.groups = list()
+        self.max_groups = max_groups  # number of categoricals to be encoded as is. Any other categories will become (Others)
+        self.groups = groups  # pre-define a list of groups from prior knowledge presents
 
     def fit(self, X, y=None):
+        if self.groups is not None:
+            self.max_groups = len(self.groups)
+            return self
+
         if self.max_groups is None:
             self.max_groups = int(np.ceil(np.sqrt(len(X.unique()))))
         self.groups = X.value_counts(sort=True, ascending=False).nlargest(self.max_groups).index.tolist()
