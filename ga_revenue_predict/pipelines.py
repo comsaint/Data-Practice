@@ -3,6 +3,9 @@ Pipelines and transforms to be performed.
 """
 import logging
 from sklearn.base import TransformerMixin
+import datetime
+import pandas as pd
+import numpy as np
 
 # Custom transformers for this project only
 
@@ -34,14 +37,31 @@ class ColumnSelector(TransformerMixin):
         return X[self.col]
 
 
-class generate_datetime_features(TransformerMixin):
-    def transform(self, X):
+class DatetimeFeaturesGenerator(TransformerMixin):
+    def transform(self, X, y=None):
         """
         Generates following features from `date` object `X`:
-        YEAR, MONTH, DAY OF YEAR, DAY OF MONTH, WEEK OF YEAR, WEEKDAY
+        YEAR, MONTH, DAY, QUARTER, DAY OF YEAR, WEEK OF YEAR, WEEKDAY
         if `X` is `datetime` object, the following extra features are returned:
         HOUR, MINUTE, MINUTE OF DAY
         :param X:
         :return:
         """
-        pass
+        X_out = pd.concat([X.dt.year, X.dt.month, X.dt.day,
+                           X.dt.quarter, X.dt.dayofyear, X.dt.weekofyear, X.dt.weekday], axis=1)
+        X_out.columns = [X.name + '_' + n for n in [
+            'year', 'month', 'day', 'quarter', 'dayofyear', 'weekofyear', 'weekday'
+        ]]
+        if X.dtype == np.dtype('datetime64[ns]'):
+            X_out_time = pd.concat([X.dt.hour, X.dt.minute], axis=1)
+            X_out_time.columns = [X.name + '_' + n for n in ['hour', 'minute']]
+            X_out = pd.concat([X_out, X_out_time], axis=1)
+        return X_out
+
+
+class TimestampToDatetimeConverter(TransformerMixin):
+    def __init__(self, tz=datetime.timezone.utc):
+        self.tz = tz  # default UTC time
+
+    def transform(self, X, y=None):
+        return X.map(lambda t: datetime.datetime.fromtimestamp(t, tz=self.tz))
