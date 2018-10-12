@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import FunctionTransformer, LabelEncoder
-from sklearn.base import TransformerMixin
+from sklearn.base import TransformerMixin, BaseEstimator
 import matplotlib.pyplot as plt
 import itertools
 
@@ -64,6 +64,26 @@ class ModifiedLabelEncoder(LabelEncoder):
 
     def transform(self, y, *args, **kwargs):
         return super().transform(y).reshape(-1, 1)
+
+
+class CategoryGroupEncoder(BaseEstimator, TransformerMixin):
+    """
+    Input a series of categories, returns a series with the most frequent `max_groups` unchanged,
+    and others as "(Others)".
+    `max_group` equals to the (ceiling of) square-root of number of categories by default.
+    """
+    def __init__(self, max_groups=None, groups=None):
+        self.max_groups = max_groups
+        self.groups = list()
+
+    def fit(self, X, y=None):
+        if self.max_groups is None:
+            self.max_groups = int(np.ceil(np.sqrt(len(X.unique()))))
+        self.groups = X.value_counts(sort=True, ascending=False).nlargest(self.max_groups).index.tolist()
+        return self
+
+    def transform(self, X):
+        return X.map(lambda g: g if g in self.groups else '(Others)')
 
 
 class DataFrameTransformer(object):

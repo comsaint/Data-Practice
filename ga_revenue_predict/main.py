@@ -15,8 +15,6 @@ from .Paths import FULLPATH_DATA_TRAIN_PARSED, FULLPATH_DATA_TEST_PARSED
 # Load raw data
 loader = Loader()
 df_train, df_test = loader.run(mode='raw', subsample=0.01)
-print(df_train.head())
-print(df_train.dtypes)
 
 # remove unused columns
 rc = RemoveColumns(USE_COLS)
@@ -59,10 +57,44 @@ print(NUM_COLS)
 from sklearn_pandas import DataFrameMapper
 train_data_mapper = DataFrameMapper([
      (NUM_COLS, SimpleImputer(strategy='constant', fill_value=0.0)),
-     #(TARGET, [SimpleImputer(strategy='constant', fill_value=0.0), FunctionTransformer(log1p)])
-], input_df=True, df_out=True)
+     (TARGET, [SimpleImputer(strategy='constant', fill_value=0.0), FunctionTransformer(log1p)])
+], input_df=True, df_out=True, default=None)
 
-df_train_parsed = train_data_mapper.transform(df_train_rc)
+test_data_mapper = DataFrameMapper([
+     (NUM_COLS, SimpleImputer(strategy='constant', fill_value=0.0)),
+], input_df=True, df_out=True, default=None)
+
+df_train_parsed = train_data_mapper.fit_transform(df_train_rc)
+df_test_parsed = test_data_mapper.fit_transform(df_test_rc)
+#print(train_data_mapper.transformed_names_)
+
+df_train_parsed.rename({'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_0': 'totals.bounces',
+                        'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_1': 'totals.hits',
+                        'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_2': 'totals.newVisits',
+                        'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_3': 'totals.pageviews'},
+                       axis=1, inplace=True)
+df_test_parsed.rename({'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_0': 'totals.bounces',
+                       'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_1': 'totals.hits',
+                       'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_2': 'totals.newVisits',
+                       'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_3': 'totals.pageviews'},
+                      axis=1, inplace=True)
+df_train_parsed = df_train_parsed.astype(df_train_rc.dtypes.to_dict())
+df_test_parsed = df_test_parsed.astype(df_test_rc.dtypes.to_dict())
+
+df_train_parsed = df_train_parsed.astype({'totals.bounces': int,
+                                          'totals.hits': int,
+                                          'totals.newVisits': int,
+                                          'totals.pageviews': int,
+                                          'totals.transactionRevenue': float,
+                                          'trafficSource.isTrueDirect': bool})
+df_test_parsed = df_test_parsed.astype({'totals.bounces': int,
+                                          'totals.hits': int,
+                                          'totals.newVisits': int,
+                                          'totals.pageviews': int,
+                                        'trafficSource.isTrueDirect': bool})
+
 print(df_train_parsed.head(10))
 print(df_train_parsed.dtypes)
-print(train_data_mapper.transformed_names_)
+
+store_df_and_dtypes(df_train_parsed, path=FULLPATH_DATA_TRAIN_PARSED, index=False)
+store_df_and_dtypes(df_test_parsed, path=FULLPATH_DATA_TEST_PARSED, index=False)
