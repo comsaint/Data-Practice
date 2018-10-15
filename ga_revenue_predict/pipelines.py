@@ -4,7 +4,7 @@ Pipelines and transforms to be performed.
 import logging
 from .Loader import Loader
 from .Settings import USE_COLS, NUM_COLS, TARGET
-from .CommonFunctions import store_df_and_dtypes, deduplicate_repeated_sessionId
+from .CommonFunctions import store_df_and_dtypes, read_df_and_dtypes, deduplicate_repeated_sessionId
 from sklearn_pandas import DataFrameMapper
 from .sk_util import RemoveColumns
 from sklearn.impute import SimpleImputer
@@ -73,3 +73,9 @@ def preprocessing():
     store_df_and_dtypes(df_train_parsed, path=FULLPATH_DATA_TRAIN_PARSED, index=False)
     store_df_and_dtypes(df_test_parsed, path=FULLPATH_DATA_TEST_PARSED, index=False)
     return 0
+
+
+def read_parsed_data():
+    df_train = read_df_and_dtypes(path=FULLPATH_DATA_TRAIN_PARSED)
+    df_test = read_df_and_dtypes(path=FULLPATH_DATA_TEST_PARSED)
+    return df_train, df_test

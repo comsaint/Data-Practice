@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import json
 
 
@@ -85,4 +86,12 @@ def read_df_and_dtypes(path, **kwargs):
     """
     path_dtypes = path.replace(r'.csv', r'.json')
     kwargs.update({'dtype': read_dtypes_json(path_dtypes)})
+    col_dt = []
+    for col_name, col_dtype in kwargs['dtype'].items():
+        if 'datetime64' in col_dtype:
+            col_dt.append(col_name)
+    if col_dt != []:
+        for col in col_dt:
+            del kwargs['dtype'][col]
+        kwargs.update({'parse_dates': col_dt})
     return pd.read_csv(path, **kwargs)
