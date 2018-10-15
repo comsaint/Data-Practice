@@ -2,97 +2,74 @@
 Pipelines and transforms to be performed.
 """
 import logging
-from sklearn.base import TransformerMixin
-import datetime
-import pandas as pd
-import numpy as np
-
-# Custom transformers for this project only
-
-
-class RemoveColumns(TransformerMixin):
-    """
-    Drop unused columns from train and test set.
-    """
-    def __init__(self, use_col):
-        self.use_col = use_col
-
-    def transform(self, X):
-        # Check if any use_col does not exist in DF, and omit them
-        col_omit = []
-        for col in self.use_col:
-            if col not in X.columns:
-                logging.warning("Column {} not found in DataFrame. Omit.".format(col))
-                col_omit.append(col)
-        for col in col_omit:
-            self.use_col.remove(col)
-        return X[self.use_col]
+from .Loader import Loader
+from .Settings import USE_COLS, NUM_COLS, TARGET
+from .CommonFunctions import store_df_and_dtypes, deduplicate_repeated_sessionId
+from sklearn_pandas import DataFrameMapper
+from .sk_util import RemoveColumns
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import FunctionTransformer
+from .Paths import FULLPATH_DATA_TRAIN_PARSED, FULLPATH_DATA_TEST_PARSED
 
 
-class ColumnSelector(TransformerMixin):
-    def __init__(self, col):
-        self.col = col
+def preprocessing():
+    # Preprocessing steps, dropping unuse columns, fix dtypes, merge duplicated session IDs, impute missing values.
+    from numpy import log1p
+    # Load raw data
+    loader = Loader()
+    #df_train, df_test = loader.run(mode='raw', subsample=0.01)
+    df_train, df_test = loader.run(mode='raw')
 
-    def transform(self, X):
-        return X[self.col]
+    # De-duplicate
+    df_train = deduplicate_repeated_sessionId(df_train)
+    df_test = deduplicate_repeated_sessionId(df_test)
 
+    # remove unused columns
+    rc = RemoveColumns(USE_COLS)
+    df_train_rc = rc.transform(df_train)
+    df_test_rc = rc.transform(df_test)
 
-class DatetimeFeaturesGenerator(TransformerMixin):
-    def transform(self, X, y=None):
-        """
-        Generates following features from `date` object `X`:
-        YEAR, MONTH, DAY, QUARTER, DAY OF YEAR, WEEK OF YEAR, WEEKDAY
-        if `X` is `datetime` object, the following extra features are returned:
-        HOUR, MINUTE, MINUTE OF DAY
-        :param X:
-        :return:
-        """
-        X_out = pd.concat([X.dt.year, X.dt.month, X.dt.day,
-                           X.dt.quarter, X.dt.dayofyear, X.dt.weekofyear, X.dt.weekday], axis=1)
-        X_out.columns = [X.name + '_' + n for n in [
-            'year', 'month', 'day', 'quarter', 'dayofyear', 'weekofyear', 'weekday'
-        ]]
-        if X.dtype == np.dtype('datetime64[ns]'):
-            X_out_time = pd.concat([X.dt.hour, X.dt.minute], axis=1)
-            X_out_time.columns = [X.name + '_' + n for n in ['hour', 'minute']]
-            X_out = pd.concat([X_out, X_out_time], axis=1)
-        return X_out
+    train_data_mapper = DataFrameMapper([
+        (NUM_COLS, SimpleImputer(strategy='constant', fill_value=0.0)),
+        (TARGET, [SimpleImputer(strategy='constant', fill_value=0.0), FunctionTransformer(log1p)])
+    ], input_df=True, df_out=True, default=None)
 
+    test_data_mapper = DataFrameMapper([
+        (NUM_COLS, SimpleImputer(strategy='constant', fill_value=0.0)),
+    ], input_df=True, df_out=True, default=None)
 
-class TimestampToDatetimeConverter(TransformerMixin):
-    def __init__(self, tz=datetime.timezone.utc):
-        self.tz = tz  # default UTC time
+    df_train_parsed = train_data_mapper.fit_transform(df_train_rc)
+    df_test_parsed = test_data_mapper.fit_transform(df_test_rc)
+    # print(train_data_mapper.transformed_names_)
 
-    def transform(self, X, y=None):
-        return X.map(lambda t: datetime.datetime.fromtimestamp(t, tz=self.tz))
+    df_train_parsed.rename({'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_0': 'totals.bounces',
+                            'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_1': 'totals.hits',
+                            'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_2': 'totals.newVisits',
+                            'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_3': 'totals.pageviews'},
+                           axis=1, inplace=True)
+    df_test_parsed.rename({'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_0': 'totals.bounces',
+                           'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_1': 'totals.hits',
+                           'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_2': 'totals.newVisits',
+                           'totals.bounces_totals.hits_totals.newVisits_totals.pageviews_3': 'totals.pageviews'},
+                          axis=1, inplace=True)
+    df_train_parsed = df_train_parsed.astype(df_train_rc.dtypes.to_dict())
+    df_test_parsed = df_test_parsed.astype(df_test_rc.dtypes.to_dict())
 
+    df_train_parsed = df_train_parsed.astype({'totals.bounces': int,
+                                              'totals.hits': int,
+                                              'totals.newVisits': int,
+                                              'totals.pageviews': int,
+                                              'totals.transactionRevenue': float,
+                                              'trafficSource.isTrueDirect': bool})
+    df_test_parsed = df_test_parsed.astype({'totals.bounces': int,
+                                            'totals.hits': int,
+                                            'totals.newVisits': int,
+                                            'totals.pageviews': int,
+                                            'trafficSource.isTrueDirect': bool})
 
-class PeriodicFeatureEncoder(TransformerMixin):
-    def __init__(self, bound=None):
-        self.bound = bound
+    print(df_train_parsed.head(10))
+    print(df_train_parsed.dtypes)
 
-    def fit(self, X, y=None):
-        if self.bound is None:
-            self.bound = [X.min(), X.max()]
-        return self
-
-    def transform(self, X, y=None):
-        X_out = pd.concat([np.sin(2 * np.pi * X / float(self.bound[1] - self.bound[0])),
-                           np.cos(2 * np.pi * X / float(self.bound[1] - self.bound[0]))], axis=1)
-        X_out.columns = [X.name + '_' + n for n in ['sin', 'cos']]
-        return X_out
-
-
-class CategoryByTargetEncoder(TransformerMixin):
-    def __init__(self, encode_val=None):
-        self.encode_val = encode_val
-
-    def fit(self, X, y):
-        col = X.columns
-        mat = pd.concat([X, y], axis=1)
-        mat_grp = mat.groupby(col).agg(['min', 'max', 'avg', 'var', 'std'], as_index=False)
-        self.encode_val = mat_grp.to_dict('records')
-        return self
-
-    def transform(self, X, y=None):
-        pass
+    store_df_and_dtypes(df_train_parsed, path=FULLPATH_DATA_TRAIN_PARSED, index=False)
+    store_df_and_dtypes(df_test_parsed, path=FULLPATH_DATA_TEST_PARSED, index=False)
+    return 0
