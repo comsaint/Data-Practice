@@ -35,7 +35,7 @@ conda==4.5.11
 configobj==5.0.6
 ConfigSpace==0.4.6
 contextlib2==0.5.5
-cryptography==2.2.2
+cryptography==3.2
 cycler==0.10.0
 Cython==0.28.2
 cytoolz==0.9.0.1
