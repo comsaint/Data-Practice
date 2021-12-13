@@ -86,7 +86,7 @@ liac-arff==2.3.1
 llvmlite==0.23.1
 locket==0.2.0
 lockfile==0.12.2
-lxml==4.2.1
+lxml==4.6.5
 MarkupSafe==1.0
 matplotlib==2.2.2
 mccabe==0.6.1
